@@ -20,20 +20,32 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsStore
 {
     public class MvxPictureChooserTask : IMvxPictureChooserTask
     {
-        public void ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable, Action assumeCancelled)
+        public void ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality, Action<Stream, string> pictureAvailable, Action assumeCancelled)
         {
             TakePictureCommon(StorageFileFromDisk, maxPixelDimension, percentQuality, pictureAvailable, assumeCancelled);
         }
 
+        public void ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable, Action assumeCancelled)
+        {
+            this.ChoosePictureFromLibrary(maxPixelDimension, percentQuality, (stream, name) => pictureAvailable(stream), assumeCancelled);
+        }
+
+        /// <summary>
+        /// Takes a picture.
+        /// </summary>
+        /// <param name="maxPixelDimension">The maximum pixel dimension.</param>
+        /// <param name="percentQuality">The percent quality.</param>
+        /// <param name="pictureAvailable">Action to invoke when picture is available. Where parameters are the picture stream and picture display name.</param>
+        /// <param name="assumeCancelled">Action to invoke on cancellation</param>
         public void TakePicture(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable, Action assumeCancelled)
         {
-            TakePictureCommon(StorageFileFromCamera, maxPixelDimension, percentQuality, pictureAvailable, assumeCancelled);
+            TakePictureCommon(StorageFileFromCamera, maxPixelDimension, percentQuality, (stream, name) => { pictureAvailable(stream); }, assumeCancelled);
         }
 
         public Task<Stream> ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality)
         {
             var task = new TaskCompletionSource<Stream>();
-            ChoosePictureFromLibrary(maxPixelDimension, percentQuality, task.SetResult, () => task.SetResult(null));
+            ChoosePictureFromLibrary(maxPixelDimension, percentQuality, (stream, name) => task.SetResult(stream), () => task.SetResult(null));
             return task.Task;
         }
 
@@ -48,7 +60,7 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsStore
         {
         }
 
-        private void TakePictureCommon(Func<Task<StorageFile>> storageFile, int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable,
+        private void TakePictureCommon(Func<Task<StorageFile>> storageFile, int maxPixelDimension, int percentQuality, Action<Stream, string> pictureAvailable,
                                              Action assumeCancelled)
         {
             var dispatcher = Windows.UI.Core.CoreWindow.GetForCurrentThread().Dispatcher;
@@ -61,9 +73,10 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsStore
                                     });
         }
 
-        private async Task Process(Func<Task<StorageFile>> storageFile, int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable, Action assumeCancelled)
+        private async Task Process(Func<Task<StorageFile>> storageFile, int maxPixelDimension, int percentQuality, Action<Stream,string> pictureAvailable, Action assumeCancelled)
         {
             var file = await storageFile();
+
             if (file == null)
             {
                 assumeCancelled();
@@ -73,13 +86,14 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsStore
             var rawFileStream = await file.OpenAsync(FileAccessMode.Read);
             var resizedStream = await ResizeJpegStreamAsync(maxPixelDimension, percentQuality, rawFileStream);
 
-            pictureAvailable(resizedStream.AsStreamForRead());
+            pictureAvailable(resizedStream.AsStreamForRead(), file.DisplayName);
         }
 
         private static async Task<StorageFile> StorageFileFromCamera()
         {
             var dialog = new CameraCaptureUI();
             var file = await dialog.CaptureFileAsync(CameraCaptureUIMode.Photo);
+
             return file;
         }
 

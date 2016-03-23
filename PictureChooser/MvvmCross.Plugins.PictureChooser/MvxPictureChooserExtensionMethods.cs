@@ -15,7 +15,7 @@ namespace MvvmCross.Plugins.PictureChooser
         public static Task<Stream> ChoosePictureFromLibraryAsync(this IMvxPictureChooserTask chooser, int maxPixelDimension, int percentQuality)
         {
             var task = new TaskCompletionSource<Stream>();
-            chooser.ChoosePictureFromLibrary(maxPixelDimension, percentQuality, task.SetResult, () => task.SetResult(null));
+            chooser.ChoosePictureFromLibrary(maxPixelDimension, percentQuality, (stream, name) => task.SetResult(stream), () => task.SetResult(null));
             return task.Task;
         }
 

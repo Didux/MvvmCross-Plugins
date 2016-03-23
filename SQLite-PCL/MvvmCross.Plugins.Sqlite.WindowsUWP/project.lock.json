@@ -12317,7 +12317,7 @@
       ]
     },
     "MvvmCross.Binding/4.0.0": {
-      "sha512": "7OytddY5NfUDpjdWDpBrJBP6O/GpfvqPRZSh8JysW7YurhBxs/B/x0tgHo6tV/VfrIAOn75eQV01ujPElXF97w==",
+      "sha512": "ViHZIlEEM4lf2mOJiHbNMbWFs36dePMTyS1zIlIvfPfVUc6GEapnErhZ19W6nzZZG7NKa2d6i0YUrshLw6AT5A==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -12366,11 +12366,11 @@
         "lib/Xamarin.Mac20/MvvmCross.Localization.dll",
         "lib/Xamarin.Mac20/MvvmCross.Localization.dll.mdb",
         "MvvmCross.Binding.nuspec",
-        "package/services/metadata/core-properties/68785fa7da3949f4aa005a6facbc2140.psmdcp"
+        "package/services/metadata/core-properties/55916a9779bd4830b0d41b2e5b0118fd.psmdcp"
       ]
     },
     "MvvmCross.Core/4.0.0": {
-      "sha512": "l0o9vEAwnuiQf9drmGLKHeBbgtJ/Df75AJOEFZryT/5bQ6dhA9o7J/OWje9g3L1vsOT0+M+aHT3i/LWHc0iqIA==",
+      "sha512": "tUS2aluir/2ie82ILmQFZoIhxT8o+MgDMv4z8NCLGwHVGoqU1WA238lA0fcXVFNXvcMktnr6iV6S0cpxo7IpZQ==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -12406,11 +12406,11 @@
         "lib/Xamarin.Mac20/MvvmCross.Mac.dll",
         "lib/Xamarin.Mac20/MvvmCross.Mac.dll.mdb",
         "MvvmCross.Core.nuspec",
-        "package/services/metadata/core-properties/221848a91ed94165a9ac36bac9f09aba.psmdcp"
+        "package/services/metadata/core-properties/3e50cbf4348a49d98dc7158115dedfa6.psmdcp"
       ]
     },
     "MvvmCross.Platform/4.0.0": {
-      "sha512": "ecVDg0PoM37hW2c2kIfMNwo1QCyogFGlsNiOxYOB+zTZKsSqS5fQX5+umDGYuX58uZCTlJEKJ04r3FZr7tD6hA==",
+      "sha512": "PAwMCnppKblgGqFUugXaz4DQVWUXgsm2rQU54b5e1wgKbeZQ+F0VTstDv5FIY0ZwdwNq98Ky37xa/k8pZOOIKA==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -12453,7 +12453,7 @@
         "lib/Xamarin.Mac20/MvvmCross.Platform.Mac.dll",
         "lib/Xamarin.Mac20/MvvmCross.Platform.Mac.dll.mdb",
         "MvvmCross.Platform.nuspec",
-        "package/services/metadata/core-properties/6981e9fc693e4f62a71ae55b89b9e96e.psmdcp"
+        "package/services/metadata/core-properties/61c744d2795d43adbb5960b10d375fdf.psmdcp"
       ]
     },
     "SQLite.Net-PCL/3.1.1": {

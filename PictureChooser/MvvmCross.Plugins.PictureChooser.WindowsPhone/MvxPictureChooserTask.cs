@@ -18,7 +18,7 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
     {
         #region IMvxCombinedPictureChooserTask Members
 
-        public void ChooseOrTakePicture(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable,
+        public void ChooseOrTakePicture(int maxPixelDimension, int percentQuality, Action<Stream, string> pictureAvailable,
                                         Action assumeCancelled)
         {
             // note - do not set PixelHeight = maxPixelDimension, PixelWidth = maxPixelDimension here - as that would create square cropping
@@ -30,7 +30,7 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
 
         #region IMvxPictureChooserTask Members
 
-        public void ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable,
+        public void ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality, Action<Stream, string> pictureAvailable,
                                              Action assumeCancelled)
         {
             // note - do not set PixelHeight = maxPixelDimension, PixelWidth = maxPixelDimension here - as that would create square cropping
@@ -38,17 +38,22 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
             ChoosePictureCommon(chooser, maxPixelDimension, percentQuality, pictureAvailable, assumeCancelled);
         }
 
+        public void ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable, Action assumeCancelled)
+        {
+            this.ChoosePictureFromLibrary(maxPixelDimension, percentQuality, (stream, name) => pictureAvailable(stream), assumeCancelled);
+        }
+
         public void TakePicture(int maxPixelDimension, int percentQuality, Action<Stream> pictureAvailable,
                                 Action assumeCancelled)
         {
             var chooser = new CameraCaptureTask { };
-            ChoosePictureCommon(chooser, maxPixelDimension, percentQuality, pictureAvailable, assumeCancelled);
+            ChoosePictureCommon(chooser, maxPixelDimension, percentQuality, (stream, name) => pictureAvailable(stream), assumeCancelled);
         }
 
         public Task<Stream> ChoosePictureFromLibrary(int maxPixelDimension, int percentQuality)
         {
             var task = new TaskCompletionSource<Stream>();
-            ChoosePictureFromLibrary(maxPixelDimension, percentQuality, task.SetResult, () => task.SetResult(null));
+            ChoosePictureFromLibrary(maxPixelDimension, percentQuality, (stream, name) => task.SetResult(stream), () => task.SetResult(null));
             return task.Task;
         }
 
@@ -66,7 +71,7 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
         #endregion IMvxPictureChooserTask Members
 
         public void ChoosePictureCommon(ChooserBase<PhotoResult> chooser, int maxPixelDimension, int percentQuality,
-                                        Action<Stream> pictureAvailable, Action assumeCancelled)
+                                        Action<Stream, string> pictureAvailable, Action assumeCancelled)
         {
             chooser.Completed += (sender, args) =>
                 {
@@ -75,6 +80,7 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
                         ResizeThenCallOnMainThread(maxPixelDimension,
                                                    percentQuality,
                                                    args.ChosenPhoto,
+                                                   args.OriginalFileName,
                                                    pictureAvailable);
                     }
                     else
@@ -83,10 +89,10 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
             DoWithInvalidOperationProtection(chooser.Show);
         }
 
-        private void ResizeThenCallOnMainThread(int maxPixelDimension, int percentQuality, Stream input,
-                                                Action<Stream> success)
+        private void ResizeThenCallOnMainThread(int maxPixelDimension, int percentQuality, Stream input, string fileName,
+                                                Action<Stream, string> success)
         {
-            ResizeJpegStream(maxPixelDimension, percentQuality, input, (stream) => CallAsync(stream, success));
+            ResizeJpegStream(maxPixelDimension, percentQuality, input, (stream) => CallAsync(stream, fileName, success));
         }
 
         private void ResizeJpegStream(int maxPixelDimension, int percentQuality, Stream input, Action<Stream> success)
@@ -105,9 +111,9 @@ namespace MvvmCross.Plugins.PictureChooser.WindowsPhone
             success(memoryStream);
         }
 
-        private void CallAsync(Stream input, Action<Stream> success)
+        private void CallAsync(Stream input, string fileName, Action<Stream, string> success)
         {
-            Dispatcher.RequestMainThreadAction(() => success(input));
+            Dispatcher.RequestMainThreadAction(() => success(input, fileName));
         }
     }
 }
